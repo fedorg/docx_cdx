@@ -1,0 +1,296 @@
+0x0000: kCDXProp_EndObject | INT16 | Marks end of object.
+0x0001: kCDXProp_CreationUserName | CDXString |  The name of the creator (program user's name) of the document.
+0x0002: kCDXProp_CreationDate | CDXDate |  The time of object creation.
+0x0003: kCDXProp_CreationProgram | CDXString |  The name of the program, including version and platform, that created the associated CDX object. ChemDraw 4.0 uses ChemDraw 4.0 as the value of CreationProgram.
+0x0004: kCDXProp_ModificationUserName | CDXString |  The name of the last modifier (program user's name) of the document.
+0x0005: kCDXProp_ModificationDate | CDXDate |  Time of the last modification.
+0x0006: kCDXProp_ModificationProgram | CDXString |  The name of the program, including version and platform, of the last program to perform a modification. ChemDraw 4.0 uses ChemDraw 4.0 as the value of CreationProgram.
+0x0007: kCDXProp_Unused1 | obsolete |  Table of contents.
+0x0008: kCDXProp_Name | CDXString |  Name of an object.
+0x0009: kCDXProp_Comment | CDXString |  An arbitrary string intended to be meaningful to a user.
+0x000A: kCDXProp_ZOrder | INT16 |  Back-to-front ordering index in 2D drawing.
+0x000B: kCDXProp_RegistryNumber | CDXString |  A registry or catalog number of a molecule object.
+0x000C: kCDXProp_RegistryAuthority | CDXString |  A string that specifies the authority which issued a registry or catalog number. Some examples of registry authorities are CAS, Beilstein, Aldrich, and Merck.
+0x000D: kCDXProp_Unused2 | obsolete |  Indicates that this object (the reference object) is an alias to an object elsewhere in the document (the target object). The attributes and contained objects should be taken from the target object.
+0x000E: kCDXProp_RepresentsProperty | CDXRepresentsProperty |  Indicates that this object represents some property in some other object.
+0x000F: kCDXProp_IgnoreWarnings | CDXBooleanImplied |  Signifies whether chemical warnings should be suppressed on this object.
+0x0010: kCDXProp_ChemicalWarning | CDXString |  A warning concerning possible chemical problems with this object.
+0x0011: kCDXProp_Visible | CDXBoolean |  The object is visible if non-zero.
+# Fonts.
+0x0100: kCDXProp_FontTable | CDXFontTable |  A list of fonts used in the document.
+# Coordinates.
+0x0200: kCDXProp_2DPosition | CDXPoint2D |  The 2D location (in the order of vertical and horizontal locations) of an object.
+0x0201: kCDXProp_3DPosition | CDXPoint3D |  The 3D location (in the order of X-, Y-, and Z-locations in right-handed coordinate system) of an object in CDX coordinate units. The precise meaning of this attribute varies depending on the type of object.
+0x0202: kCDXProp_2DExtent | CDXPoint2D |  The width and height of an object in CDX coordinate units. The precise meaning of this attribute varies depending on the type of object.
+0x0203: kCDXProp_3DExtent | CDXPoint3D |  The width, height, and depth of an object in CDX coordinate units (right-handed coordinate system). The precise meaning of this attribute varies depending on the type of object.
+0x0204: kCDXProp_BoundingBox | CDXRectangle |  The smallest rectangle that encloses the graphical representation of the object.
+0x0205: kCDXProp_RotationAngle | INT32 |  The angular orientation of an object in degrees * 65536.
+0x0206: kCDXProp_BoundsInParent | CDXRectangle |  The bounds of this object in the coordinate system of its parent (used for pages within tables).
+0x0207: kCDXProp_3DHead | CDXPoint3D |  The 3D location (in the order of X-, Y-, and Z-locations in right-handed coordinate system) of the head of an object in CDX coordinate units. The precise meaning of this attribute varies depending on the type of object.
+0x0208: kCDXProp_3DTail | CDXPoint3D |  The 3D location (in the order of X-, Y-, and Z-locations in right-handed coordinate system) of the tail of an object in CDX coordinate units. The precise meaning of this attribute varies depending on the type of object.
+0x0209: kCDXProp_TopLeft | CDXPoint2D |  The location of the top-left corner of a quadrilateral object, possibly in a rotated or skewed frame.
+0x020A: kCDXProp_TopRight | CDXPoint2D |  The location of the top-right corner of a quadrilateral object, possibly in a rotated or skewed frame.
+0x020B: kCDXProp_BottomRight | CDXPoint2D |  The location of the bottom-right corner of a quadrilateral object, possibly in a rotated or skewed frame.
+0x020C: kCDXProp_BottomLeft | CDXPoint2D |  The location of the bottom-left corner of a quadrilateral object, possibly in a rotated or skewed frame.
+# Colors.
+0x0300: kCDXProp_ColorTable | CDXColorTable |  The color palette used throughout the document.
+0x0301: kCDXProp_ForegroundColor | UINT16 |  The foreground color of an object represented as the two-based index into the object's color table.
+0x0302: kCDXProp_BackgroundColor | INT16 |  The background color of an object represented as the two-based index into the object's color table.
+# Atom properties.
+0x0400: kCDXProp_Node_Type | INT16 |  The type of a node object.
+0x0401: kCDXProp_Node_LabelDisplay | INT8 |  The characteristics of node label display.
+0x0402: kCDXProp_Node_Element | INT16 |  The atomic number of the atom representing this node.
+0x0403: kCDXProp_Atom_ElementList | CDXElementList |  A list of atomic numbers.
+0x0404: kCDXProp_Atom_Formula | CDXFormula |  The composition of a node representing a fragment whose composition is known, but whose connectivity is not. For example, C<sub>4</sub>H<sub>9</sub> represents a mixture of the 4 butyl isomers.
+0x0420: kCDXProp_Atom_Isotope | INT16 |  The absolute isotopic mass of an atom (2 for deuterium, 14 for carbon-14).
+0x0421: kCDXProp_Atom_Charge | INT8 |  The atomic charge of an atom.
+0x0422: kCDXProp_Atom_Radical | UINT8 |  The atomic radical attribute of an atom.
+0x0423: kCDXProp_Atom_RestrictFreeSites | UINT8 |  Indicates that up to the specified number of additional substituents are permitted on this atom.
+0x0424: kCDXProp_Atom_RestrictImplicitHydrogens | CDXBooleanImplied |  Signifies that implicit hydrogens are not allowed on this atom.
+0x0425: kCDXProp_Atom_RestrictRingBondCount | INT8 |  The number of ring bonds attached to an atom.
+0x0426: kCDXProp_Atom_RestrictUnsaturatedBonds | INT8 |  Indicates whether unsaturation should be present or absent.
+0x0427: kCDXProp_Atom_RestrictRxnChange | CDXBooleanImplied |  If present, signifies that the reaction change of an atom must be as specified.
+0x0428: kCDXProp_Atom_RestrictRxnStereo | INT8 |  The change of stereochemistry of an atom during a reaction.
+0x0429: kCDXProp_Atom_AbnormalValence | CDXBooleanImplied |  Signifies that an abnormal valence for an atom is permitted.
+0x042A: kCDXProp_Unused3 | INT16
+0x042B: kCDXProp_Atom_NumHydrogens | UINT16 |  The number of (explicit) hydrogens in a labeled atom consisting of one heavy atom and (optionally) the symbol H (e.g., CH<sub>3</sub>).
+0x042C: kCDXProp_Unused4 | INT16
+0x042D: kCDXProp_Unused5 | INT16
+0x042E: kCDXProp_Atom_HDot | CDXBooleanImplied |  Signifies the presence of an implicit hydrogen with stereochemistry specified equivalent to an explicit H atom with a wedged bond.
+0x042F: kCDXProp_Atom_HDash | CDXBooleanImplied |  Signifies the presence of an implicit hydrogen with stereochemistry specified equivalent to an explicit H atom with a hashed bond.
+0x0430: kCDXProp_Atom_Geometry | INT8 |  The geometry of the bonds about this atom.
+0x0431: kCDXProp_Atom_BondOrdering | CDXObjectIDArray |  An ordering of the bonds to this node, used for stereocenters, fragments, and named alternative groups with more than one attachment.
+0x0432: kCDXProp_Node_Attachments | CDXObjectIDArrayWithCounts |  For multicenter attachment nodes or variable attachment nodes, a list of IDs of the nodes which are multiply or variably attached to this node.
+0x0433: kCDXProp_Atom_GenericNickname | CDXString |  The name of the generic nickname.
+0x0434: kCDXProp_Atom_AltGroupID | CDXObjectID |  The ID of the alternative group object that describes this node.
+0x0435: kCDXProp_Atom_RestrictSubstituentsUpTo | UINT8 |  Indicates that substitution is restricted to no more than the specified value.
+0x0436: kCDXProp_Atom_RestrictSubstituentsExactly | UINT8 |  Indicates that exactly the specified number of substituents must be present.
+0x0437: kCDXProp_Atom_CIPStereochemistry | INT8 |  The node's absolute stereochemistry according to the Cahn-Ingold-Prelog system.
+0x0438: kCDXProp_Atom_Translation | INT8 |  Provides for restrictions on whether a given node may match other more- or less-general nodes.
+0x0439: kCDXProp_Atom_AtomNumber | CDXString |  Atom number, as text.
+0x043A: kCDXProp_Atom_ShowQuery | CDXBoolean |  Show the query indicator if non-zero.
+0x043B: kCDXProp_Atom_ShowStereo | CDXBoolean |  Show the stereochemistry indicator if non-zero.
+0x043C: kCDXProp_Atom_ShowAtomNumber | CDXBoolean |  Show the atom number if non-zero.
+0x043D: kCDXProp_Atom_LinkCountLow | INT16 |  Low end of repeat count for link nodes.
+0x043E: kCDXProp_Atom_LinkCountHigh | INT16 |  High end of repeat count for link nodes.
+0x043F: kCDXProp_Atom_IsotopicAbundance | INT8 |  Isotopic abundance of this atom's isotope.
+0x0440: kCDXProp_Atom_ExternalConnectionType | INT8 |  Type of external connection, for atoms of type kCDXNodeType_ExternalConnectionPoint.
+# Molecule properties.
+0x0500: kCDXProp_Mole_Racemic | CDXBoolean |  Indicates that the molecule is a racemic mixture.
+0x0501: kCDXProp_Mole_Absolute | CDXBoolean |  Indicates that the molecule has known absolute configuration.
+0x0502: kCDXProp_Mole_Relative | CDXBoolean |  Indicates that the molecule has known relative stereochemistry, but unknown absolute configuration.
+0x0503: kCDXProp_Mole_Formula | CDXFormula |  The molecular formula representation of a molecule object.
+0x0504: kCDXProp_Mole_Weight | FLOAT64 |  The average molecular weight of a molecule object.
+0x0505: kCDXProp_Frag_ConnectionOrder | CDXObjectIDArray |  An ordered list of attachment points within a fragment.
+# Bond properties.
+0x0600: kCDXProp_Bond_Order | INT16 |  The order of a bond object.
+0x0601: kCDXProp_Bond_Display | INT16 |  The display type of a bond object.
+0x0602: kCDXProp_Bond_Display2 | INT16 |  The display type for the second line of a double bond.
+0x0603: kCDXProp_Bond_DoublePosition | INT16 |  The position of the second line of a double bond.
+0x0604: kCDXProp_Bond_Begin | CDXObjectID |  The ID of the CDX node object at the first end of a bond.
+0x0605: kCDXProp_Bond_End | CDXObjectID |  The ID of the CDX node object at the second end of a bond.
+0x0606: kCDXProp_Bond_RestrictTopology | INT8 |  Indicates the desired topology of a bond in a query.
+0x0607: kCDXProp_Bond_RestrictRxnParticipation | INT8 |  Specifies that a bond is affected by a reaction.
+0x0608: kCDXProp_Bond_BeginAttach | UINT8 |  Indicates where within the Bond_Begin node a bond is attached.
+0x0609: kCDXProp_Bond_EndAttach | UINT8 |  Indicates where within the Bond_End node a bond is attached.
+0x060A: kCDXProp_Bond_CIPStereochemistry | INT8 |  The bond's absolute stereochemistry according to the Cahn-Ingold-Prelog system.
+0x060B: kCDXProp_Bond_BondOrdering | CDXObjectIDArray |  Ordered list of attached bond IDs.
+0x060C: kCDXProp_Bond_ShowQuery | CDXBoolean |  Show the query indicator if non-zero.
+0x060D: kCDXProp_Bond_ShowStereo | CDXBoolean |  Show the stereochemistry indicator if non-zero.
+0x060E: kCDXProp_Bond_CrossingBonds | CDXObjectIDArray |  Unordered list of IDs of bonds that cross this one (either above or below).
+0x060F: kCDXProp_Bond_ShowRxn | CDXBoolean |  Show the reaction-change indicator if non-zero.
+# Text properties.
+0x0700: kCDXProp_Text | CDXString |  The text of a text object.
+0x0701: kCDXProp_Justification | INT8 |  The horizontal justification of a text object.
+0x0702: kCDXProp_LineHeight | UINT16 |  The line height of a text object.
+0x0703: kCDXProp_WordWrapWidth | INT16 |  The word-wrap width of a text object.
+0x0704: kCDXProp_LineStarts | INT16ListWithCounts |  The number of lines of a text object followed by that many values indicating the zero-based text position of each line start.
+0x0705: kCDXProp_LabelAlignment | INT8 |  The alignment of the text with respect to the node position.
+0x0706: kCDXProp_LabelLineHeight | INT16 |  Text line height for atom labels
+0x0707: kCDXProp_CaptionLineHeight | INT16 |  Text line height for non-atomlabel text objects
+0x0708: kCDXProp_InterpretChemically | CDXBooleanImplied |  Signifies whether to the text label should be interpreted chemically (if possible).
+# Document properties.
+0x0800: kCDXProp_MacPrintInfo | Unformatted |  The 120 byte Macintosh TPrint data associated with the CDX document object. Refer to Macintosh Toolbox manual for detailed description.
+0x0801: kCDXProp_WinPrintInfo | Unformatted |  The Windows DEVMODE structure associated with the CDX document object.
+0x0802: kCDXProp_PrintMargins | CDXRectangle |  The outer margins of the Document.
+0x0803: kCDXProp_ChainAngle | INT32 |  The default chain angle setting in degrees * 65536.
+0x0804: kCDXProp_BondSpacing | INT16 |  The spacing between segments of a multiple bond, measured relative to bond length.
+0x0805: kCDXProp_BondLength | CDXCoordinate |  The default bond length.
+0x0806: kCDXProp_BoldWidth | CDXCoordinate |  The default bold bond width.
+0x0807: kCDXProp_LineWidth | CDXCoordinate |  The default line width.
+0x0808: kCDXProp_MarginWidth | CDXCoordinate |  The default amount of space surrounding atom labels.
+0x0809: kCDXProp_HashSpacing | CDXCoordinate |  The default spacing between hashed lines used in wedged hashed bonds.
+0x080A: kCDXProp_LabelStyle | CDXFontStyle |  The default style for atom labels.
+0x080B: kCDXProp_CaptionStyle | CDXFontStyle |  The default style for non-atomlabel text objects.
+0x080C: kCDXProp_CaptionJustification | INT8 |  The horizontal justification of a caption (non-atomlabel text object)
+0x080D: kCDXProp_FractionalWidths | CDXBooleanImplied |  Signifies whether to use fractional width information when drawing text.
+0x080E: kCDXProp_Magnification | INT16 |  The view magnification factor
+0x080F: kCDXProp_WidthPages | INT16 |  The width of the document in pages.
+0x0810: kCDXProp_HeightPages | INT16 |  The height of the document in pages.
+0x0811: kCDXProp_DrawingSpaceType | INT8 |  The type of drawing space used for this document.
+0x0812: kCDXProp_Width | CDXCoordinate |  The width of an object in CDX coordinate units, possibly in a rotated or skewed frame.
+0x0813: kCDXProp_Height | CDXCoordinate |  The height of an object in CDX coordinate units, possibly in a rotated or skewed frame.
+0x0814: kCDXProp_PageOverlap | CDXCoordinate |  The amount of overlap of pages when a poster is tiled.
+0x0815: kCDXProp_Header | CDXString |  The text of the header.
+0x0816: kCDXProp_HeaderPosition | CDXCoordinate |  The vertical offset of the header baseline from the top of the page.
+0x0817: kCDXProp_Footer | CDXString |  The text of the footer.
+0x0818: kCDXProp_FooterPosition | CDXCoordinate |  The vertical offset of the footer baseline from the bottom of the page.
+0x0819: kCDXProp_PrintTrimMarks | CDXBooleanImplied |  If present, trim marks are to printed in the margins.
+0x081A: kCDXProp_LabelStyleFont | INT16 |  The default font family for atom labels.
+0x081B: kCDXProp_CaptionStyleFont | INT16 |  The default font style for captions (non-atom-label text objects).
+0x081C: kCDXProp_LabelStyleSize | INT16 |  The default font size for atom labels.
+0x081D: kCDXProp_CaptionStyleSize | INT16 |  The default font size for captions (non-atom-label text objects).
+0x081E: kCDXProp_LabelStyleFace | INT16 |  The default font style for atom labels.
+0x081F: kCDXProp_CaptionStyleFace | INT16 |  The default font face for captions (non-atom-label text objects).
+0x0820: kCDXProp_LabelStyleColor | INT16 |  The default color for atom labels
+0x0821: kCDXProp_CaptionStyleColor | INT16 |  The default color for captions (non-atom-label text objects).
+0x0822: kCDXProp_BondSpacingAbs | CDXCoordinate |  The absolute distance between segments of a multiple bond.
+0x0823: kCDXProp_LabelJustification | INT8 |  The default justification for atom labels.
+0x0824: kCDXProp_FixInplaceExtent | CDXPoint2D |  Defines a size for OLE In-Place editing.
+0x0825: kCDXProp_Side | INT16 |  A specific side of an object (rectangle).
+0x0826: kCDXProp_FixInplaceGap | CDXPoint2D |  Defines a padding for OLE In-Place editing.
+# Window properties.
+0x0900: kCDXProp_Window_IsZoomed | CDXBooleanImplied |  Signifies whether the main viewing window is zoomed (maximized).
+0x0901: kCDXProp_Window_Position | CDXPoint2D |  The top-left position of the main viewing window.
+0x0902: kCDXProp_Window_Size | CDXPoint2D |  Height and width of the document window.
+
+# Graphic object properties.
+0x0A00: kCDXProp_Graphic_Type | INT16 |  The type of graphical object.
+0x0A01: kCDXProp_Line_Type | INT16 |  The type of a line object.
+0x0A02: kCDXProp_Arrow_Type | INT16 |  The type of arrow object, which represents line, arrow, arc, rectangle, or orbital.
+0x0A03: kCDXProp_Rectangle_Type | INT16 |  The type of a rectangle object.
+0x0A04: kCDXProp_Oval_Type | INT16 |  The type of an arrow object that represents a circle or ellipse.
+0x0A05: kCDXProp_Orbital_Type | INT16 |  The type of orbital object.
+0x0A06: kCDXProp_Bracket_Type | INT16 |  The type of symbol object.
+0x0A07: kCDXProp_Symbol_Type | INT16 |  The type of symbol object.
+0x0A08: kCDXProp_Curve_Type | INT16 |  The type of curve object.
+0x0A20: kCDXProp_Arrow_HeadSize | INT16 |  The size of the arrow's head.
+0x0A21: kCDXProp_Arc_AngularSize | INT16 |  The size of an arc (in degrees * 10, so 90 degrees = 900).
+0x0A22: kCDXProp_Bracket_LipSize | INT16 |  The size of a bracket.
+0x0A23: kCDXProp_Curve_Points | CDXCurvePoints |  The B&eacute;zier curve's control point locations.
+0x0A24: kCDXProp_Bracket_Usage | INT8 |  The syntactical chemical meaning of the bracket (SRU, mer, mon, xlink, etc).
+0x0A25: kCDXProp_Polymer_RepeatPattern | INT8 |  The head-to-tail connectivity of objects contained within the bracket.
+0x0A26: kCDXProp_Polymer_FlipType | INT8 |  The flip state of objects contained within the bracket.
+0x0A27: kCDXProp_BracketedObjects | CDXObjectIDArray |  The set of objects contained in a BracketedGroup.
+0x0A28: kCDXProp_Bracket_RepeatCount | INT16 |  The number of times a multiple-group BracketedGroup is repeated.
+0x0A29: kCDXProp_Bracket_ComponentOrder | INT16 |  The component order associated with a BracketedGroup.
+0x0A2A: kCDXProp_Bracket_SRULabel | CDXString |  The label associated with a BracketedGroup that represents an SRU.
+0x0A2B: kCDXProp_Bracket_GraphicID | CDXObjectID |  The ID of a graphical object (bracket, brace, or parenthesis) associated with a Bracket Attachment.
+0x0A2C: kCDXProp_Bracket_BondID | CDXObjectID |  The ID of a bond that crosses a Bracket Attachment.
+0x0A2D: kCDXProp_Bracket_InnerAtomID | CDXObjectID |  The ID of the node located within the Bracketed Group and attached to a bond that crosses a Bracket Attachment.
+0x0A2E: kCDXProp_Curve_Points3D | CDXCurvePoints3D |  The B&eacute;zier curve's control point locations.
+# Embedded pictures.
+0x0A60: kCDXProp_Picture_Edition | Unformatted |  The section information (SectionHandle) of the Macintosh Publish & Subscribe edition embedded in the CDX picture object.
+0x0A61: kCDXProp_Picture_EditionAlias | Unformatted |  The alias information of the Macintosh Publish & Subscribe edition embedded in the CDX picture object.
+0x0A62: kCDXProp_MacPICT | Unformatted |  A Macintosh PICT data object.
+0x0A63: kCDXProp_WindowsMetafile | Unformatted |  A Microsoft Windows Metafile object.
+0x0A64: kCDXProp_OLEObject | Unformatted |  An OLE object.
+0x0A65: kCDXProp_EnhancedMetafile | Unformatted |  A Microsoft Windows Enhanced Metafile object.
+# Spectrum properties
+0x0A80: kCDXProp_Spectrum_XSpacing | FLOAT64 |  The spacing in logical units (ppm, Hz, wavenumbers) between points along the X-axis of an evenly-spaced grid.
+0x0A81: kCDXProp_Spectrum_XLow | FLOAT64 |  The first data point for the X-axis of an evenly-spaced grid.
+0x0A82: kCDXProp_Spectrum_XType | INT16 |  The type of units the X-axis represents.
+0x0A83: kCDXProp_Spectrum_YType | INT16 |  The type of units the Y-axis represents.
+0x0A84: kCDXProp_Spectrum_XAxisLabel | CDXString |  A label for the X-axis.
+0x0A85: kCDXProp_Spectrum_YAxisLabel | CDXString |  A label for the Y-axis.
+0x0A86: kCDXProp_Spectrum_DataPoint | FLOAT64 |  The Y-axis values for the spectrum. It is an array of double values corresponding to X-axis values.
+0x0A87: kCDXProp_Spectrum_Class | INT16 |  The type of spectrum represented.
+0x0A88: kCDXProp_Spectrum_YLow | FLOAT64 |  Y value to be used to offset data when storing XML.
+0x0A89: kCDXProp_Spectrum_YScale | FLOAT64 |  Y scaling used to scale data when storing XML.
+# TLC properties
+0x0AA0: kCDXProp_TLC_OriginFraction | FLOAT64 |  The distance of the origin line from the bottom of a TLC Plate, as a fraction of the total height of the plate.
+0x0AA1: kCDXProp_TLC_SolventFrontFraction | FLOAT64 |  The distance of the solvent front from the top of a TLC Plate, as a fraction of the total height of the plate.
+0x0AA2: kCDXProp_TLC_ShowOrigin | CDXBoolean |  Show the origin line near the base of the TLC Plate if non-zero.
+0x0AA3: kCDXProp_TLC_ShowSolventFront | CDXBoolean |  Show the solvent front line near the top of the TLC Plate if non-zero.
+0x0AA4: kCDXProp_TLC_ShowBorders | CDXBoolean |  Show borders around the edges of the TLC Plate if non-zero.
+0x0AA5: kCDXProp_TLC_ShowSideTicks | CDXBoolean |  Show tickmarks up the side of the TLC Plate if non-zero.
+0x0AB0: kCDXProp_TLC_Rf | FLOAT64 |  The Retention Factor of an individual spot.
+0x0AB1: kCDXProp_TLC_Tail | CDXCoordinate |  The length of the "tail" of an individual spot.
+0x0AB2: kCDXProp_TLC_ShowRf | CDXBoolean |  Show the spot's Retention Fraction (Rf) value if non-zero.
+# Alternate Group properties
+0x0B00: kCDXProp_NamedAlternativeGroup_TextFrame | CDXRectangle |  The bounding box of upper portion of the Named Alternative Group, containing the name of the group.
+0x0B01: kCDXProp_NamedAlternativeGroup_GroupFrame | CDXRectangle |  The bounding box of the lower portion of the Named Alternative Group, containing the definition of the group.
+0x0B02: kCDXProp_NamedAlternativeGroup_Valence | INT16 |  The number of attachment points in each alternative in a named alternative group.
+# Geometry and Constraint properties
+0x0B80: kCDXProp_GeometricFeature | INT8 |  The type of the geometrical feature (point, line, plane, etc.).
+0x0B81: kCDXProp_RelationValue | INT8 |  The numeric relationship (if any) among the basis objects used to define this object.
+0x0B82: kCDXProp_BasisObjects | CDXObjectIDArray |  An ordered list of objects used to define this object.
+0x0B83: kCDXProp_ConstraintType | INT8 |  The constraint type (distance or angle).
+0x0B84: kCDXProp_ConstraintMin | FLOAT64 |  The minimum value of the constraint
+0x0B85: kCDXProp_ConstraintMax | FLOAT64 |  The maximum value of the constraint
+0x0B86: kCDXProp_IgnoreUnconnectedAtoms | CDXBooleanImplied |  Signifies whether unconnected atoms should be ignored within the exclusion sphere.
+0x0B87: kCDXProp_DihedralIsChiral | CDXBooleanImplied |  Signifies whether a dihedral is signed or unsigned.
+0x0B88: kCDXProp_PointIsDirected | CDXBooleanImplied |  For a point based on a normal, signifies whether it is in a specific direction relative to the reference point.
+# Reaction properties
+0x0C00: kCDXProp_ReactionStep_Atom_Map | CDXObjectIDArray |  Represents pairs of mapped atom IDs; each pair is a reactant atom mapped to to a product atom.
+0x0C01: kCDXProp_ReactionStep_Reactants | CDXObjectIDArray |  An order list of reactants present in the Reaction Step.
+0x0C02: kCDXProp_ReactionStep_Products | CDXObjectIDArray |  An order list of products present in the Reaction Step.
+0x0C03: kCDXProp_ReactionStep_Plusses | CDXObjectIDArray |  An ordered list of pluses used to separate components of the Reaction Step.
+0x0C04: kCDXProp_ReactionStep_Arrows | CDXObjectIDArray |  An ordered list of arrows used to separate components of the Reaction Step.
+0x0C05: kCDXProp_ReactionStep_ObjectsAboveArrow | CDXObjectIDArray |  An order list of objects above the arrow in the Reaction Step.
+0x0C06: kCDXProp_ReactionStep_ObjectsBelowArrow | CDXObjectIDArray |  An order list of objects below the arrow in the Reaction Step.
+0x0C07: kCDXProp_ReactionStep_Atom_Map_Manual | CDXObjectIDArray |  Represents pairs of mapped atom IDs; each pair is a reactant atom mapped to to a product atom.
+0x0C08: kCDXProp_ReactionStep_Atom_Map_Auto | CDXObjectIDArray |  Represents pairs of mapped atom IDs; each pair is a reactant atom mapped to to a product atom.
+# CDObjectTag properties
+0x0D00: kCDXProp_ObjectTag_Type | INT16 |  The tag's data type.
+0x0D01: kCDXProp_Unused6 | obsolete |  obsolete
+0x0D02: kCDXProp_Unused7 | obsolete |  obsolete
+0x0D03: kCDXProp_ObjectTag_Tracking | CDXBoolean |  The tag will participate in tracking if non-zero.
+0x0D04: kCDXProp_ObjectTag_Persistent | CDXBoolean |  The tag will be resaved to a CDX file if non-zero.
+0x0D05: kCDXProp_ObjectTag_Value | varies |  The value is a INT32, FLOAT64 or unformatted string depending on the value of ObjectTag_Type.
+0x0D06: kCDXProp_Positioning | INT8 |  How the indicator should be positioned with respect to its containing object.
+0x0D07: kCDXProp_PositioningAngle | INT32 |  Angular positioning, in radians * 65536.
+0x0D08: kCDXProp_PositioningOffset | CDXPoint2D |  Offset positioning.
+# CDSequence properties
+0x0E00: kCDXProp_Sequence_Identifier | CDXString |  A unique (but otherwise random) identifier for a given Sequence object.
+# CDCrossReference properties
+0x0F00: kCDXProp_CrossReference_Container | CDXString |  An external object containing (as an embedded object) the document containing the Sequence object being referenced.
+0x0F01: kCDXProp_CrossReference_Document | CDXString |  An external document containing the Sequence object being referenced.
+0x0F02: kCDXProp_CrossReference_Identifier | CDXString |  A unique (but otherwise random) identifier for a given Cross-Reference object.
+0x0F03: kCDXProp_CrossReference_Sequence | CDXString |  A value matching the SequenceIdentifier of the Sequence object to be referenced.
+# Miscellaneous properties.
+0x1000: kCDXProp_Template_PaneHeight | CDXCoordinate |  The height of the viewing window of a template grid.
+0x1001: kCDXProp_Template_NumRows | INT16 |  The number of rows of the CDX TemplateGrid object.
+0x1002: kCDXProp_Template_NumColumns | INT16 |  The number of columns of the CDX TemplateGrid object.
+0x1100: kCDXProp_Group_Integral | CDXBoolean |  The group is considered to be integral (non-subdivisible) if non-zero.
+0x1FF0: kCDXProp_SplitterPositions | CDXObjectIDArray |  An array of vertical positions that subdivide a page into regions.
+0x1FF1: kCDXProp_PageDefinition | CDXObjectIDArray |  An array of vertical positions that subdivide a page into regions.
+# User defined properties
+# First 1024 tags are reserved for temporary tags used only during the runtime.
+0x4000: kCDXUser_TemporaryBegin
+0x4400: kCDXUser_TemporaryEnd
+# Objects.
+0x8000: kCDXObj_Document
+0x8001: kCDXObj_Page
+0x8002: kCDXObj_Group
+0x8003: kCDXObj_Fragment
+0x8004: kCDXObj_Node
+0x8005: kCDXObj_Bond
+0x8006: kCDXObj_Text
+0x8007: kCDXObj_Graphic
+0x8008: kCDXObj_Curve
+0x8009: kCDXObj_EmbeddedObject
+0x800a: kCDXObj_NamedAlternativeGroup
+0x800b: kCDXObj_TemplateGrid
+0x800c: kCDXObj_RegistryNumber
+0x800d: kCDXObj_ReactionScheme
+0x800e: kCDXObj_ReactionStep
+0x800f: kCDXObj_ObjectDefinition
+0x8010: kCDXObj_Spectrum
+0x8011: kCDXObj_ObjectTag
+0x8012: kCDXObj_OleClientItem	# obsolete
+0x8013: kCDXObj_Sequence
+0x8014: kCDXObj_CrossReference
+0x8015: kCDXObj_Splitter
+0x8016: kCDXObj_Table
+0x8017: kCDXObj_BracketedGroup
+0x8018: kCDXObj_BracketAttachment
+0x8019: kCDXObj_CrossingBond
+0x8020: kCDXObj_Border
+0x8021: kCDXObj_Geometry
+0x8022: kCDXObj_Constraint
+0x8023: kCDXObj_TLCPlate
+0x8024: kCDXObj_TLCLane
+0x8025: kCDXObj_TLCSpot
+# Add new objects here
+0x8FFF: kCDXObj_UnknownObject
