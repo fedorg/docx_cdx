@@ -29,12 +29,12 @@ def default_format_mapper(form, data):
     return (None, None)
 
 
-def read_mols_from_docx(filename, format_mapper=default_format_mapper):
+def read_mols_from_docx(filename, format_mapper=default_format_mapper,*, rIds=None):
     from .docx_handling import read_objs_from_doc
     from tempfile import NamedTemporaryFile
     import openbabel
     obconv = openbabel.OBConversion()
-    for form, data in read_objs_from_doc(filename, mapper=format_mapper, paths=[['CONTENTS'], ['\x03PRINT'], ['MNOVA-CONTENTS']]):
+    for form, data in read_objs_from_doc(filename, mapper=format_mapper, paths=[['CONTENTS'], ['\x03PRINT'], ['MNOVA-CONTENTS']], rIds=rIds):
         with NamedTemporaryFile() as tf:
             tf.write(data)
             tf.seek(0)
@@ -106,6 +106,14 @@ def create_mol(elems, bonds):
     #                 cfgs.append(gen_stereo_config_for_atom(a.GetId(), refs, from_id))
     #         apply_stereo_configs(mol, cfgs)
     return mol
+
+
+def mol_from_cdx_bytes(data):
+    from tempfile import NamedTemporaryFile
+    with NamedTemporaryFile() as tf:
+        tf.write(data)
+        tf.seek(0)
+        return mol_from_cdx(tf.name)
 
 
 def mol_from_cdx(filename):
