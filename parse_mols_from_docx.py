@@ -58,18 +58,28 @@ def read_mols_from_docx(filename, format_mapper=default_format_mapper,*, rIds=No
 def create_mol(elems, bonds):
     import openbabel as ob
     mol = ob.OBMol()
+    mol.SetDimension(2)
     mol.BeginModify()
     atoms = []
+    aliases = []
     for e in elems:
         a = mol.NewAtom()
         atoms.append(a)
         a.SetAtomicNum(e['element'])
-        a.SetSpinMultiplicity(e['spin'])
-        a.SetFormalCharge(e['charge'])
         x, y, z = e.get('x', 0), e.get('y', 0), e.get('z', 0)
         # print('xyz', x, y, z)
         scaling = 1 / 65536.0 / 10
         a.SetVector(x * scaling, y * scaling, z * scaling)
+        if e['type'] == 'alias':
+            text = e.get('text')
+            if text:
+                ad = ob.AliasData()
+                ad.SetAlias(text)
+                ad.SetOrigin(ob.fileformatInput)
+                aliases.append((a, ad))
+            continue
+        a.SetSpinMultiplicity(e['spin'])
+        a.SetFormalCharge(e['charge'])
     for b in bonds:
         order = 1
         ar = 0
@@ -90,10 +100,15 @@ def create_mol(elems, bonds):
         if updown == 'wedge': bond.SetWedge()
         if updown == 'hash': bond.SetHash()
     mol.Center()
-    mol.EndModify()
     mol.DeleteData(ob.StereoData)
-    ob.StereoFrom2D(mol)
+    ob.StereoFrom2D(mol)  # TODO: check E-Z correspondence & roundtrip
+    mol.EndModify()
     mol.SetChiralityPerceived()  # mark the molecule chirality as manually assinged to stop ob auto-guessing
+    # Expand aliases
+    for a, ad in aliases:
+        if (not ad.IsExpanded()):
+            ad.Expand(mol, a.GetIdx()) # Make chemically meaningful, if possible.
+    
     #         cfgs = []
     #         for a, e in zip(atoms, elems):
     #             if e.get('refs'):
@@ -131,12 +146,31 @@ def mol_from_cdx(filename):
             obj_id = str(el.obj_id)
             ret[obj_id] = ret.get(obj_id, {})
             r = ret[obj_id]
+            skip_objects = set()
+            def find_in_node(node, tag):
+                for ent in node.content:
+                    if ent.tag != tag: continue
+                    return ent
+            
             for prop in el.content:
-                if hasattr(prop, 'obj'):
+                if hasattr(prop, 'obj') and prop.obj.obj_id not in skip_objects:
                     find_chem_objects(prop, ret)
                 if hasattr(prop, 'prop'):
                     tag = prop.tag
                     p = prop.prop
+                    if tag == Cdx.Proptype.node_type:
+                        nt = p.content
+                        if (nt == 4 or nt == 5): # Nickname or fragment
+                            r['type'] = 'alias'
+                            # print('alias', hex(el.obj_id))
+                            obj_text = find_in_node(el, Cdx.Proptype.obj_text)
+                            obj_fragment = find_in_node(el, Cdx.Proptype.obj_fragment)
+                            if obj_text:
+                                to = obj_text.obj
+                                skip_objects.add(to.obj_id)
+                                text_prop = find_in_node(to, Cdx.Proptype.text)
+                                if text_prop: r['text'] = text_prop.prop.content.text
+                            if obj_fragment: skip_objects.add(obj_fragment.obj.obj_id)
                     if tag == Cdx.Proptype.node_element:
                         r['type'] = 'element'
                         r['element'] = p.content
@@ -172,10 +206,12 @@ def mol_from_cdx(filename):
         for k, v in objlist.items():
             if v.get('type') == 'bond':
                 # mark bound objects as elements
-                ret[v['end']]['type'] = 'element'
-                ret[v['begin']]['type'] = 'element'
+                ret[v['end']]['type'] = ret[v['end']].get('type', 'element')
+                ret[v['begin']]['type'] = ret[v['begin']].get('type', 'element')
+                pass
 
         def augment_with_defaults(v):
+            if v['type'] == 'alias': return {**v, 'element': 0}
             if v['type'] == 'element': return {'spin': 0, 'charge': 0, 'element': 6, **v}
             if v['type'] == 'bond': return {'order_flag': 1, **v}
             return v
@@ -191,8 +227,11 @@ def mol_from_cdx(filename):
         assert (isinstance(root,
                            OrderedDict)), "Regular dict does not preserve order and CDX depends on object order to provide stereochemistry."
         for k, v in root.items():
-            if v['type'] == 'element':
+            if (v['type'] == 'element'):
                 elems.append(v)
+                elem_map[k] = len(elems)  # 1-based
+            if (v['type'] == 'alias'): # or (v.get('text') is not None and not v.get('element')):
+                elems.append({**v, 'type': 'alias'})
                 elem_map[k] = len(elems)  # 1-based
         bonds = []
         for k, v in root.items():
