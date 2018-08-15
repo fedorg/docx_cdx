@@ -29,6 +29,25 @@ def default_format_mapper(form, data):
     return (None, None)
 
 
+def rd_map_from_ob(mol):
+    from rdkit.Chem import RWMol, Atom, BondType
+    rm = RWMol()
+    for i in range(mol.NumAtoms()):
+        a = mol.GetAtomById(i)
+        ra = Atom(a.GetAtomicNum())
+        rm.AddAtom(ra)
+    for i in range(mol.NumBonds()):
+        b = mol.GetBondById(i)
+        b.GetBeginAtom().GetId()
+        order = BondType.SINGLE
+        if b.GetBO() == 2:
+            order = BondType.DOUBLE
+        if b.GetBO() == 3:
+            order = BondType.TRIPLE
+        rm.AddBond(b.GetBeginAtom().GetId(), b.GetEndAtom().GetId(),order)#b.GetBondOrder())
+    return rm
+
+
 def read_mols_from_docx(filename, format_mapper=default_format_mapper,*, rIds=None):
     from .docx_handling import read_objs_from_doc
     from tempfile import NamedTemporaryFile
@@ -52,8 +71,65 @@ def read_mols_from_docx(filename, format_mapper=default_format_mapper,*, rIds=No
                     if mdl: yield mdl
             except Exception as e:
                 import sys
-                print(f'Error in {filename}: {e}', file=sys.stderr)
-                # raise
+                #print(f'Error in {filename}: {e}', file=sys.stderr)
+                raise
+
+
+# def gen_tetrahedral_stereo_config_for_atom(atom_id, refs, from_id):
+#     """ Chirality data uses atom IDs rather than IDX
+#     If we have neighbor info, then tetrahedral stereo might be described with only 1 bit: parity. This is a more general impl
+#     """
+#     IMPLICIT_REF = 4294967294
+#     def array_pad(arr, val, min_len):
+#         return [*arr, *[val for _ in range(max([0, min_len-len(arr)]))]]
+#     obs = openbabel.OBStereo
+#     cfg = ob.OBTetrahedralConfig()
+#     cfg.view = obs.ViewFrom
+#     cfg.winding = obs.AntiClockwise
+#     cfg.center = atom_id
+#     cfg.refs = array_pad(refs, IMPLICIT_REF, 3)
+#     cfg.from_or_towards = from_id
+#     cfg.specified = True
+#     return cfg
+
+# def gen_tetrahedral_stereo_config_from_parity(mol, center_id, parity):
+#     atom = mol.GetAtomById(center_id)
+#     neighbors = [n.GetId() for n in openbabel.OBAtomAtomIter(atom)]
+#     from_id = min(neighbors)
+#     refs = neighbors if parity else reversed(neighbors)
+#     cfg = gen_tetrahedral_stereo_config_for_atom(cente_id, refs, from_id)
+#     return cfg
+
+# def apply_tetrahedral_stereo_configs(mol, cfgs):
+#     mol.DeleteData(openbabel.StereoData)
+#     mol.SetChiralityPerceived()  # mark the molecule chirality as manually assinged to stop ob auto-guessing
+#     ts = ob.OBTetrahedralStereo(mol)
+#     for cfg in cfgs:
+#         ts = ob.OBTetrahedralStereo(mol)
+#         ts.SetConfig(cfg)
+#         mol.CloneData(ts)
+# #     mol.CloneData(ts)
+
+def apply_cistrans(mol, bond_id, refs):
+    import openbabel as ob
+    bond = mol.GetBond(bond_id)
+    if not refs: return
+    if bond.GetBO() != 2:
+        print('Non-double bond has cistrans stereo')
+        return
+    neighbors1 = [n.GetId() for n in ob.OBAtomAtomIter(bond.GetBeginAtom())]
+    neighbors2 = [n.GetId() for n in ob.OBAtomAtomIter(bond.GetEndAtom())]
+    
+    #print(f'applying cistrans {refs} to bond {bond_id}, neighbors: {neighbors1} {neighbors2}')
+    IMPLICIT_REF = 4294967294
+    ct_stereo = ob.OBCisTransStereo(mol)
+    config = ct_stereo.GetConfig()
+    config.begin = bond.GetBeginAtom().GetId()
+    config.end = bond.GetEndAtom().GetId()
+    config.refs = [(r if r is not None else IMPLICIT_REF) for r in refs]
+    config.specified = True
+    ct_stereo.SetConfig(config)
+    mol.CloneData(ct_stereo)
 
 def create_mol(elems, bonds):
     import openbabel as ob
@@ -62,6 +138,7 @@ def create_mol(elems, bonds):
     mol.BeginModify()
     atoms = []
     aliases = []
+    bond_refs = {}
     for e in elems:
         a = mol.NewAtom()
         atoms.append(a)
@@ -93,22 +170,40 @@ def create_mol(elems, bonds):
             order = b['order_flag']
         else:
             order = 1
+
+
         if order > 0:
-            mol.AddBond(b['begin'], b['end'], order)
-        bond = mol.GetBond(mol.NumBonds() - 1)
-        updown = b.get('updown')
-        if updown == 'wedge': bond.SetWedge()
-        if updown == 'hash': bond.SetHash()
+            # Create bond and set bond stereo
+            stereo = b.get('bond_stereo')
+            if (stereo in [4,7,10,12]):
+                b_begin, b_end = b['end'], b['begin']
+            else:
+                b_begin, b_end = b['begin'], b['end']
+            mol.AddBond(b_begin, b_end, order)
+            # mol.AddBond(b['begin'], b['end'], order)
+            # set double bond stereo
+            bond_id = mol.NumBonds() - 1
+            bond_refs[bond_id] = b.get('bond_refs')
+            bond = mol.GetBond(bond_id)
+            if (stereo == 3 or stereo == 4): bond.SetWedge()
+            if (stereo == 6 or stereo == 7): bond.SetHash()
+
     mol.Center()
-    mol.DeleteData(ob.StereoData)
+    #mol.DeleteData(ob.StereoData)
     ob.StereoFrom2D(mol)  # TODO: check E-Z correspondence & roundtrip
     mol.EndModify()
     mol.SetChiralityPerceived()  # mark the molecule chirality as manually assinged to stop ob auto-guessing
+
+    for bond_id in range(mol.NumBonds()):
+        refs = bond_refs.get(bond_id)
+        # print(refs)
+        if not refs: continue   
+        apply_cistrans(mol, bond_id, [(r - 1 if r is not None else None) for r in refs])
+    
     # Expand aliases
     for a, ad in aliases:
         if (not ad.IsExpanded()):
             ad.Expand(mol, a.GetIdx()) # Make chemically meaningful, if possible.
-    
     #         cfgs = []
     #         for a, e in zip(atoms, elems):
     #             if e.get('refs'):
@@ -118,8 +213,9 @@ def create_mol(elems, bonds):
     #                 refs = [*(set(refs)-set([from_id]))]
     #                 print(f'atom {a.GetId()}, from {from_id}')
     #                 pprint(refs)
-    #                 cfgs.append(gen_stereo_config_for_atom(a.GetId(), refs, from_id))
-    #         apply_stereo_configs(mol, cfgs)
+    #                 cfgs.append(gen_tetrahedral_stereo_config_for_atom(a.GetId(), refs, from_id))
+    #         apply_tetrahedral_stereo_configs(mol, cfgs)
+
     return mol
 
 
@@ -183,11 +279,11 @@ def mol_from_cdx(filename):
                     if tag == Cdx.Proptype.atom_radical:
                         r['spin'] = p.content
                     if tag == Cdx.Proptype.bond_display:
-                        stereo = p.content
-                        if (stereo == 3 or stereo == 4): r['updown'] = 'wedge'
-                        if (stereo == 6 or stereo == 7): r['updown'] = 'hash'
-                    if tag == Cdx.Proptype.atom_bond_ordering:  # or tag == Cdx.Proptype.bond_bond_ordering:
-                        r['refs'] = [str(obj.obj_id) for obj in p.content.objs if obj.obj_id != 0]
+                        r['bond_stereo'] = p.content
+                    if tag == Cdx.Proptype.bond_bond_ordering:
+                        r['bond_refs'] = [(str(obj.obj_id) if obj.obj_id != 0 else None ) for obj in p.content.objs]
+                    if tag == Cdx.Proptype.atom_bond_ordering:
+                        r['refs'] = [(str(obj.obj_id) if obj.obj_id != 0 else None ) for obj in p.content.objs]
                     if tag == Cdx.Proptype.bond_begin:
                         r['type'] = 'bond'
                         r['begin'] = str(p.content.obj_id)
@@ -221,6 +317,16 @@ def mol_from_cdx(filename):
         return ret
 
     def renumber_elements(root):
+        def enumerate_bound_atoms(root_atoms, bonds):
+            ret = []
+            for b in bonds:
+                if b is None:
+                    ret.append(None)
+                    continue
+                other = list(set([b['begin'], b['end']]) - set(root_atoms))
+                if (len(other)):
+                    ret.append(other[0])
+            return ret
         elems = []
         elem_map = {}
         from collections import OrderedDict
@@ -235,12 +341,19 @@ def mol_from_cdx(filename):
                 elem_map[k] = len(elems)  # 1-based
         bonds = []
         for k, v in root.items():
-            #             if v.get('refs') and v['type'] == 'element':
-            #                 elem_id = elem_map[k] - 1
-            #                 refs = enumerate_bound_atoms(k, [root[el] for el in v['refs']])
-            #                 elems[elem_id] = {**elems[elem_id], 'refs': [elem_map[r] for r in refs]}
+            if v['type'] == 'element':
+                if v.get('refs'):
+                    elem_id = elem_map[k] - 1
+                    refs = enumerate_bound_atoms([k], [root.get(r) for r in v['refs']])
+                    new_refs = [(elem_map[r] if r else None) for r in refs]
+                    elems[elem_id] = {**elems[elem_id], 'refs': new_refs}
             if v['type'] == 'bond':
-                bonds.append({**v, 'begin': elem_map[v['begin']], 'end': elem_map[v['end']]})
+                newbond = {**v, 'begin': elem_map[v['begin']], 'end': elem_map[v['end']]}
+                if v.get('bond_refs'):
+                    refs = enumerate_bound_atoms([v['begin'], v['end']], [root.get(r) for r in v['bond_refs']])
+                    new_refs = [(elem_map[r] if r else None) for r in refs]
+                    newbond = {**newbond, 'bond_refs': new_refs}
+                bonds.append(newbond)
         return elems, bonds
 
     objects = find_chem_objects(root)
