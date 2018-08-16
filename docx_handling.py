@@ -128,6 +128,7 @@ def get_docx_table_embeddings(filename):
     
     def get_table_row_rIds(row):
         ret = []
+        try:
         for ps in [cell.paragraphs for cell in row.cells]:
             for rs in [p.runs for p in ps if p]:
                 for x in [r.element.findall('{*}object/{*}OLEObject') for r in rs if r]:
@@ -136,6 +137,7 @@ def get_docx_table_embeddings(filename):
                         try:
                             ret.append(o.get(qn("r:id")))
                         except Exception as e: pass
+        except: pass
         return ret
     
     doc = Document(filename)
@@ -145,9 +147,11 @@ def get_docx_table_embeddings(filename):
         header = None
         for n_row, row in enumerate(tbl.rows):
             vals = []
+            try:
             for cell in row.cells:
-                text = '\n'.join([p.text for p in cell.paragraphs if (p and p.text)])
-                vals.append(text or None)
+                    text = '\n'.join([p.text for p in cell.paragraphs if (cell.paragraphs and p is not None and p.text is not None)])
+                    vals.append(text)
+            except: pass
             ret.append(vals)
             row_rids.append(get_table_row_rIds(row))
         yield (ret, row_rids)
