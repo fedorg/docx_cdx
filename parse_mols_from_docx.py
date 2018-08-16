@@ -54,6 +54,7 @@ def read_mols_from_docx(filename, format_mapper=default_format_mapper,*, rIds=No
     import openbabel
     obconv = openbabel.OBConversion()
     for form, data in read_objs_from_doc(filename, mapper=format_mapper, paths=[['CONTENTS'], ['\x03PRINT'], ['MNOVA-CONTENTS']], rIds=rIds):
+        if data is None:
         with NamedTemporaryFile() as tf:
             tf.write(data)
             tf.seek(0)
@@ -231,7 +232,6 @@ def mol_from_cdx(filename):
     from .parse_cdx import Cdx
     fix_kaitai_enum(Cdx)
     f = Cdx.from_file(filename)
-    root = f.document.content[0]
 
     def find_chem_objects(root, ret=None):
         from collections import OrderedDict
@@ -334,10 +334,10 @@ def mol_from_cdx(filename):
                            OrderedDict)), "Regular dict does not preserve order and CDX depends on object order to provide stereochemistry."
         for k, v in root.items():
             if (v['type'] == 'element'):
-                elems.append(v)
+                elems.append({**v, 'obj_id': k})
                 elem_map[k] = len(elems)  # 1-based
             if (v['type'] == 'alias'): # or (v.get('text') is not None and not v.get('element')):
-                elems.append({**v, 'type': 'alias'})
+                elems.append({**v, 'type': 'alias', 'obj_id': k})
                 elem_map[k] = len(elems)  # 1-based
         bonds = []
         for k, v in root.items():
@@ -356,7 +356,10 @@ def mol_from_cdx(filename):
                 bonds.append(newbond)
         return elems, bonds
 
-    objects = find_chem_objects(root)
+    from collections import OrderedDict
+    objects = OrderedDict()
+    for root in f.document.content:
+        find_chem_objects(root, objects)
     from pprint import pprint
     objects = insert_defaults(objects)
     #     pprint(objects)
