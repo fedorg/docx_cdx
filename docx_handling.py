@@ -104,21 +104,28 @@ def read_objs_from_doc(filename,*, paths=None, mapper=None, relpath=None, rIds=N
         ole_paths = [r.get('Target') for r in rels if r.get('Type', '').endswith('oleObject')]
     else:
         pathmap = dict(rels_to_paths(rels))
-        ole_paths = [pathmap[r] for r in rIds]
+        ole_paths = [pathmap[r] for r in rIds] # don't drop invalid records to preserve ordering
     for ole in read_zip_files(filename, ole_paths, errors='ignore'):
-        if ole is None: continue
+        if ole is None:
+            yield (None, None)
+            continue
         form, obj = read_ole_contents(ole, paths=paths)
         if obj is None:
             # print('empty', filename, form)
+            yield (None, None)
             continue
         # print(form, filename)
         try:
             _form, _obj = mapper(form, obj)
             if _obj is not None:
                 yield (_form, _obj)
+            else:
+                yield (None, None)
         except Exception as e:
             import sys
             print(filename, e, file=sys.stderr)
+            yield (None, None)
+            # raise
     return
 
 
@@ -129,14 +136,14 @@ def get_docx_table_embeddings(filename):
     def get_table_row_rIds(row):
         ret = []
         try:
-        for ps in [cell.paragraphs for cell in row.cells]:
-            for rs in [p.runs for p in ps if p]:
-                for x in [r.element.findall('{*}object/{*}OLEObject') for r in rs if r]:
-                    if not x: continue
-                    for o in x:
-                        try:
-                            ret.append(o.get(qn("r:id")))
-                        except Exception as e: pass
+            for ps in [cell.paragraphs for cell in row.cells]:
+                for rs in [p.runs for p in ps if p]:
+                    for x in [r.element.findall('{*}object/{*}OLEObject') for r in rs if r]:
+                        if not x: continue
+                        for o in x:
+                            try:
+                                ret.append(o.get(qn("r:id")))
+                            except Exception as e: pass
         except: pass
         return ret
     
@@ -148,7 +155,7 @@ def get_docx_table_embeddings(filename):
         for n_row, row in enumerate(tbl.rows):
             vals = []
             try:
-            for cell in row.cells:
+                for cell in row.cells:
                     text = '\n'.join([p.text for p in cell.paragraphs if (cell.paragraphs and p is not None and p.text is not None)])
                     vals.append(text)
             except: pass

@@ -55,21 +55,21 @@ def read_mols_from_docx(filename, format_mapper=default_format_mapper,*, rIds=No
     obconv = openbabel.OBConversion()
     for form, data in read_objs_from_doc(filename, mapper=format_mapper, paths=[['CONTENTS'], ['\x03PRINT'], ['MNOVA-CONTENTS']], rIds=rIds):
         if data is None:
+            yield None
+            continue
         with NamedTemporaryFile() as tf:
             tf.write(data)
             tf.seek(0)
             try:
+                obconv.SetInAndOutFormats(form, 'mol')
+                mdl = None
+                mol = openbabel.OBMol()
                 if (form == 'cdx'):
                     mol = mol_from_cdx(tf.name)
-                    obconv.SetInAndOutFormats(form, 'mol')
-                    mdl = obconv.WriteString(mol)
-                    if mdl: yield mdl
                 else:
-                    obconv.SetInAndOutFormats(form, 'mol')
-                    mol = openbabel.OBMol()
                     obconv.ReadFile(mol, tf.name)
-                    mdl = obconv.WriteString(mol)
-                    if mdl: yield mdl
+                mdl = obconv.WriteString(mol)
+                yield (mdl if (mdl and len(mdl) > 3) else None)
             except Exception as e:
                 import sys
                 #print(f'Error in {filename}: {e}', file=sys.stderr)
@@ -267,6 +267,9 @@ def mol_from_cdx(filename):
                                 text_prop = find_in_node(to, Cdx.Proptype.text)
                                 if text_prop: r['text'] = text_prop.prop.content.text
                             if obj_fragment: skip_objects.add(obj_fragment.obj.obj_id)
+                    if tag == Cdx.Proptype.text:
+                        #print('text', p.content.text, r)
+                        pass
                     if tag == Cdx.Proptype.node_element:
                         r['type'] = 'element'
                         r['element'] = p.content
